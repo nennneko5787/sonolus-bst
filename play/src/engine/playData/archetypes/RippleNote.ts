@@ -3,6 +3,15 @@ import { skin } from '../skin.js'
 import { Note } from './Note.js'
 
 export class RippleNote extends Note {
+    preprocess() {
+        super.preprocess()
+
+        this.visualTime.copyFrom(
+            Range.l.mul(1).add(timeScaleChanges.at(this.targetTime).scaledTime),
+        )
+        this.spawnTime = this.visualTime.min - 2000
+    }
+
     updateParallel() {
         if (this.despawn) return
 
