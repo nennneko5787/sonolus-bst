@@ -1,4 +1,14 @@
-import { note, v0, v1, v2, v3, v4, v5, v6, v7 } from '../../../../../shared/src/engine/constants.js'
+import {
+    sizes,
+    v0,
+    v1,
+    v2,
+    v3,
+    v4,
+    v5,
+    v6,
+    v7,
+} from '../../../../../shared/src/engine/constants.js'
 import { skin } from '../skin.js'
 import { other } from './OtherManager.js'
 
@@ -170,7 +180,7 @@ export class Stage extends Archetype {
         // ripples
         skin.sprites.rippleNoteGuide.draw(
             Rect.one
-                .mul(note.radius * 2.5)
+                .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
                 .translate(-1.25, 0),
             0,
@@ -179,7 +189,7 @@ export class Stage extends Archetype {
 
         skin.sprites.rippleNoteGuide.draw(
             Rect.one
-                .mul(note.radius * 2.5)
+                .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
                 .translate(-0.75, 0.75),
             0,
@@ -188,7 +198,7 @@ export class Stage extends Archetype {
 
         skin.sprites.rippleNoteGuide.draw(
             Rect.one
-                .mul(note.radius * 2.5)
+                .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
                 .translate(-0.75, -0.75),
             0,
@@ -197,7 +207,7 @@ export class Stage extends Archetype {
 
         skin.sprites.rippleNoteGuide.draw(
             Rect.one
-                .mul(note.radius * 2.5)
+                .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
                 .translate(1.25, 0),
             0,
@@ -206,7 +216,7 @@ export class Stage extends Archetype {
 
         skin.sprites.rippleNoteGuide.draw(
             Rect.one
-                .mul(note.radius * 2.5)
+                .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
                 .translate(0.75, 0.75),
             0,
@@ -215,7 +225,7 @@ export class Stage extends Archetype {
 
         skin.sprites.rippleNoteGuide.draw(
             Rect.one
-                .mul(note.radius * 2.5)
+                .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
                 .translate(0.75, -0.75),
             0,
@@ -224,7 +234,7 @@ export class Stage extends Archetype {
 
         skin.sprites.rippleNoteGuide.draw(
             Rect.one
-                .mul(note.radius * 2.5)
+                .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
                 .translate(0, 0),
             0,
@@ -239,8 +249,8 @@ export class Stage extends Archetype {
 
         const center = new Vec(0, 0)
 
-        const outer = note.radius * 7
-        const inner = note.radius * 5.5
+        const outer = sizes.rippleNote * 7
+        const inner = sizes.rippleNote * 5.5
         for (let i = 0; i < filled; i++) {
             const a0 = start + step * i
             const a1 = a0 + step

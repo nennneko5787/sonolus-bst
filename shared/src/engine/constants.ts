@@ -1,5 +1,7 @@
-export const note = {
-    radius: 0.05,
+export const sizes = {
+    note: 0.075,
+    rippleNote: 0.05,
+    effectSize: 0.15,
 }
 
 export const v0: VecLike = { x: 0.4619, y: 0.1913 }
@@ -11,7 +13,6 @@ export const v5: VecLike = { x: -0.1913, y: -0.4619 }
 export const v6: VecLike = { x: 0.1913, y: -0.4619 }
 export const v7: VecLike = { x: 0.4619, y: -0.1913 }
 
-// 各辺の中点（中心座標）
 export const c0: VecLike = { x: (v0.x + v1.x) / 2, y: (v0.y + v1.y) / 2 }
 export const c1: VecLike = { x: (v1.x + v2.x) / 2, y: (v1.y + v2.y) / 2 }
 export const c2: VecLike = { x: (v2.x + v3.x) / 2, y: (v2.y + v3.y) / 2 }

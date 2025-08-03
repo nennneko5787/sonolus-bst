@@ -1,5 +1,5 @@
-import { note } from '../../../../../shared/src/engine/constants.js'
-import { skin } from '../skin.js'
+import { sizes } from '../../../../../../shared/src/engine/constants.js'
+import { skin } from '../../skin.js'
 import { Note } from './Note.js'
 
 export class RippleNote extends Note {
@@ -24,7 +24,7 @@ export class RippleNote extends Note {
         let size = duration > 0 ? (t - travelStart) / duration : 1
         size = Math.min(Math.max(size, 0), 1)
 
-        const r = note.radius
+        const r = sizes.rippleNote
         const lane = this.import.lane
         const cx =
             lane === 0
@@ -65,8 +65,10 @@ export class RippleNote extends Note {
             .scale(1, -1)
             .translate(cx, cy)
         const hitLayout = Rect.one.mul(r * 2.5 * 5).translate(cx, cy)
+        const effectHitbox = Rect.one.mul(r * 5).translate(cx, cy)
 
         this.hitbox.copyFrom(hitLayout)
+        this.effectHitbox.copyFrom(effectHitbox)
         skin.sprites.rippleNote.draw(layout, this.z, 0.4)
         skin.sprites.rippleNote.draw(normalLayout, this.z, size)
     }

@@ -1,12 +1,12 @@
 import { EngineArchetypeDataName } from '@sonolus/core'
-import { note, windows } from '../../../../../shared/src/engine/constants.js'
-import { getLaneX, getLaneY } from '../../../../../shared/src/engine/utils.js'
-import { options } from '../../configuration/options.js'
-import { buckets } from '../buckets.js'
-import { particle } from '../particle.js'
-import { skin } from '../skin.js'
+import { sizes, windows } from '../../../../../../shared/src/engine/constants.js'
+import { getLaneX, getLaneY } from '../../../../../../shared/src/engine/utils.js'
+import { options } from '../../../configuration/options.js'
+import { buckets } from '../../buckets.js'
+import { particle } from '../../particle.js'
+import { skin } from '../../skin.js'
+import { updateGrooveGauge } from '../OtherManager.js'
 import { Note } from './Note.js'
-import { updateGrooveGauge } from './OtherManager.js'
 
 export class LongNote extends Note {
     import = this.defineImport({
@@ -101,7 +101,7 @@ export class LongNote extends Note {
 
         const t = time.now
         const holdDuration = this.visualTime.max - this.visualTime.min
-        const r = note.radius
+        const r = sizes.note
         const lane = this.import.lane
         const cx = getLaneX(lane)
         const cy = getLaneY(lane)
@@ -178,12 +178,14 @@ export class LongNote extends Note {
             skin.sprites.longNote.draw(Rect.one.mul(r).translate(headX, headY), this.z, 1)
             skin.sprites.longNote.draw(Rect.one.mul(r).translate(tx, ty), this.z, 1)
             this.hitbox.copyFrom(Rect.one.mul(r * 5).translate(headX, headY))
+            this.effectHitbox.copyFrom(Rect.one.mul(sizes.effectSize).translate(headX, headY))
             return
         }
 
         if (t < hEnd + holdDuration) {
             skin.sprites.longNote.draw(Rect.one.mul(r).translate(cx, cy), this.z, 1)
             this.hitbox.copyFrom(Rect.one.mul(r * 5).translate(cx, cy))
+            this.effectHitbox.copyFrom(Rect.one.mul(sizes.effectSize).translate(cx, cy))
             return
         }
     }

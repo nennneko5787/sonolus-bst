@@ -1,10 +1,10 @@
-import { holdWindows, windows } from '../../../../../shared/src/engine/constants.js'
-import { buckets } from '../buckets.js'
-import { particle } from '../particle.js'
-import { skin } from '../skin.js'
-import { isUsed, markAsUsed } from './InputManager.js'
+import { holdWindows, windows } from '../../../../../../shared/src/engine/constants.js'
+import { buckets } from '../../buckets.js'
+import { particle } from '../../particle.js'
+import { skin } from '../../skin.js'
+import { isUsed, markAsUsed } from '../InputManager.js'
+import { updateGrooveGauge } from '../OtherManager.js'
 import { Note } from './Note.js'
-import { updateGrooveGauge } from './OtherManager.js'
 
 export class SlashNote extends Note {
     activatedTouchId = this.entityMemory(TouchId)
@@ -35,7 +35,7 @@ export class SlashNote extends Note {
 
         this.result.accuracy = timeJudge
 
-        particle.effects.note.spawn(this.hitbox, 0.3, false)
+        particle.effects.note.spawn(this.effectHitbox, 0.3, false)
 
         updateGrooveGauge(this.result.judgment)
 
@@ -49,7 +49,7 @@ export class SlashNote extends Note {
         this.result.bucket.index = buckets.slashNote.index
         this.result.bucket.value = this.result.accuracy * 1000
 
-        particle.effects.note.spawn(this.hitbox, 0.3, false)
+        particle.effects.note.spawn(this.effectHitbox, 0.3, false)
 
         updateGrooveGauge(this.result.judgment)
 

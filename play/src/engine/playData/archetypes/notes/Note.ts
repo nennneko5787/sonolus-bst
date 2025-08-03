@@ -1,12 +1,12 @@
 import { EngineArchetypeDataName } from '@sonolus/core'
-import { bucketWindows, note, windows } from '../../../../../shared/src/engine/constants.js'
-import { getLaneX, getLaneY } from '../../../../../shared/src/engine/utils.js'
-import { options } from '../../configuration/options.js'
-import { buckets } from '../buckets.js'
-import { particle } from '../particle.js'
-import { skin } from '../skin.js'
-import { isUsed, markAsUsed } from './InputManager.js'
-import { other, updateGrooveGauge } from './OtherManager.js'
+import { bucketWindows, sizes, windows } from '../../../../../../shared/src/engine/constants.js'
+import { getLaneX, getLaneY } from '../../../../../../shared/src/engine/utils.js'
+import { options } from '../../../configuration/options.js'
+import { buckets } from '../../buckets.js'
+import { particle } from '../../particle.js'
+import { skin } from '../../skin.js'
+import { isUsed, markAsUsed } from '../InputManager.js'
+import { other, updateGrooveGauge } from '../OtherManager.js'
 
 export class Note extends Archetype {
     import = this.defineImport({
@@ -23,6 +23,7 @@ export class Note extends Archetype {
     hasInput = true
     hitbox = this.entityMemory(Rect)
     sprite = skin.sprites.note
+    effectHitbox = this.entityMemory(Rect)
 
     initialize() {
         this.z = 1000 - this.targetTime
@@ -67,7 +68,7 @@ export class Note extends Archetype {
             this.result.bucket.index = buckets.note.index
             this.result.bucket.value = this.result.accuracy * 1000
 
-            particle.effects.note.spawn(this.hitbox, 0.3, false)
+            particle.effects.note.spawn(this.effectHitbox, 0.3, false)
 
             updateGrooveGauge(this.result.judgment)
 
@@ -91,7 +92,7 @@ export class Note extends Archetype {
         const travelDuration = this.visualTime.max - this.visualTime.min
         const travelEnd = this.visualTime.max
         const holdDuration = this.visualTime.max - this.visualTime.min
-        const r = note.radius
+        const r = sizes.note
         const lane = this.import.lane
         const cx = getLaneX(lane)
         const cy = getLaneY(lane)
@@ -111,7 +112,9 @@ export class Note extends Archetype {
 
             const layout = Rect.one.mul(r).translate(x, y)
             const hitLayout = Rect.one.mul(r * 5).translate(x, y)
+            const effectHitbox = Rect.one.mul(sizes.effectSize).translate(x, y)
 
+            this.effectHitbox.copyFrom(effectHitbox)
             this.hitbox.copyFrom(hitLayout)
             this.sprite.draw(layout, this.z, 1)
             return
@@ -120,7 +123,9 @@ export class Note extends Archetype {
         if (t < travelEnd + holdDuration) {
             const layout = Rect.one.mul(r).translate(cx, cy)
             const hitLayout = Rect.one.mul(r * 5).translate(cx, cy)
+            const effectHitbox = Rect.one.mul(sizes.effectSize).translate(cx, cy)
 
+            this.effectHitbox.copyFrom(effectHitbox)
             this.hitbox.copyFrom(hitLayout)
             this.sprite.draw(layout, this.z, 1)
             return
