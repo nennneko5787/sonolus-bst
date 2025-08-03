@@ -21,16 +21,27 @@ export const c5: VecLike = { x: (v5.x + v6.x) / 2, y: (v5.y + v6.y) / 2 }
 export const c6: VecLike = { x: (v6.x + v7.x) / 2, y: (v6.y + v7.y) / 2 }
 export const c7: VecLike = { x: (v7.x + v0.x) / 2, y: (v7.y + v0.y) / 2 }
 
+const toMs = ({ min, max }: Range) => new Range(Math.round(min * 1000), Math.round(max * 1000))
+
 export const windows = {
     perfect: Range.one.mul(0.05),
     great: Range.one.mul(0.1),
     good: Range.one.mul(0.2),
 }
 
-const toMs = ({ min, max }: Range) => new Range(Math.round(min * 1000), Math.round(max * 1000))
-
 export const bucketWindows = {
     perfect: toMs(windows.perfect),
     great: toMs(windows.great),
     good: toMs(windows.good),
+}
+
+export const holdWindows = {
+    perfect: Range.one.mul(0.08),
+    great: Range.one.mul(0.12),
+    good: Range.one.mul(0.16),
+}
+export const bucketHoldWindows = {
+    perfect: toMs(holdWindows.perfect),
+    great: toMs(holdWindows.great),
+    good: toMs(holdWindows.good),
 }

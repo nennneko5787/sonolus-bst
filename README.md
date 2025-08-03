@@ -4,7 +4,7 @@ A Bea◯Stream-style engine that runs on Sonolus.
 - [x] Normal note
 - [x] Hold note
 - [x] Slash note
-- [ ] Ripple note
+- [x] Ripple note
 - [ ] Stream note
 ## Special thanks
 - [ChatGPT](https://chatgpt.com) for Lane and Hold Note and Note move

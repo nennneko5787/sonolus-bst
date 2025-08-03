@@ -1,8 +1,11 @@
-import { v1 } from './constants.js'
+import { v1 } from '../../../../../shared/src/engine/constants.js'
 import { archetypes } from './index.js'
+import { other } from './OtherManager.js'
 
 export class Initialization extends Archetype {
     preprocess() {
+        other.grooveGauge = 30
+
         const gap = 0.05
         const globalAlpha = 1
         const uiRect = new Rect({
@@ -27,9 +30,9 @@ export class Initialization extends Archetype {
                 .sub(new Vec(gap, 0))
                 .sub(new Vec(0.15, 0).mul(ui.configuration.menu.scale)),
             pivot: { x: 1, y: 1 },
-            size: new Vec(0.55, 0.15).mul(ui.configuration.metric.secondary.scale),
+            size: new Vec(0.55, 0.15).mul(ui.configuration.metric.primary.scale),
             rotation: 0,
-            alpha: ui.configuration.metric.secondary.alpha * globalAlpha,
+            alpha: ui.configuration.metric.primary.alpha * globalAlpha,
             horizontalAlign: HorizontalAlign.Left,
             background: true,
         })
@@ -37,28 +40,7 @@ export class Initialization extends Archetype {
             anchor: uiRect.rt
                 .sub(new Vec(gap, 0))
                 .sub(new Vec(0.15, 0).mul(ui.configuration.menu.scale))
-                .sub(new Vec(0.035, 0.035).mul(ui.configuration.metric.secondary.scale)),
-            pivot: { x: 1, y: 1 },
-            size: new Vec(0, 0.08).mul(ui.configuration.metric.secondary.scale),
-            rotation: 0,
-            alpha: ui.configuration.metric.secondary.alpha * globalAlpha,
-            horizontalAlign: HorizontalAlign.Right,
-            background: false,
-        })
-
-        ui.metric.secondary.bar.set({
-            anchor: uiRect.lt,
-            pivot: { x: 0, y: 1 },
-            size: new Vec(0.75, 0.15).mul(ui.configuration.metric.primary.scale),
-            rotation: 0,
-            alpha: ui.configuration.metric.primary.alpha * globalAlpha,
-            horizontalAlign: HorizontalAlign.Left,
-            background: true,
-        })
-        ui.metric.secondary.value.set({
-            anchor: uiRect.lt.add(
-                new Vec(0.715, -0.035).mul(ui.configuration.metric.primary.scale),
-            ),
+                .sub(new Vec(0.035, 0.035).mul(ui.configuration.metric.primary.scale)),
             pivot: { x: 1, y: 1 },
             size: new Vec(0, 0.08).mul(ui.configuration.metric.primary.scale),
             rotation: 0,
@@ -72,16 +54,26 @@ export class Initialization extends Archetype {
             pivot: { x: 0.5, y: 0 },
             size: new Vec(0, 0.2).mul(ui.configuration.combo.scale),
             rotation: 0,
-            alpha: ui.configuration.combo.alpha,
+            alpha: 0.5,
             horizontalAlign: HorizontalAlign.Center,
-            background: false,
+            background: true,
         })
         ui.combo.text.set({
             anchor: { x: v1.x - 0.2, y: v1.y + 0.35 },
             pivot: { x: 0.5, y: 1 },
             size: new Vec(0, 0.05).mul(ui.configuration.combo.scale),
             rotation: 0,
-            alpha: ui.configuration.combo.alpha,
+            alpha: 0.5,
+            horizontalAlign: HorizontalAlign.Center,
+            background: true,
+        })
+
+        ui.judgment.set({
+            anchor: { x: 0, y: 0 },
+            pivot: { x: 0.5, y: 0 },
+            size: new Vec(0, 0).mul(ui.configuration.judgment.scale),
+            rotation: 0,
+            alpha: ui.configuration.judgment.alpha * globalAlpha,
             horizontalAlign: HorizontalAlign.Center,
             background: false,
         })

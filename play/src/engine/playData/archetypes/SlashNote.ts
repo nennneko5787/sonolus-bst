@@ -1,65 +1,62 @@
-import { EngineArchetypeDataName } from '@sonolus/core'
-import { options } from '../../configuration/options.js'
+import { holdWindows, windows } from '../../../../../shared/src/engine/constants.js'
 import { buckets } from '../buckets.js'
 import { particle } from '../particle.js'
 import { skin } from '../skin.js'
 import { isUsed, markAsUsed } from './InputManager.js'
-import { bucketWindows, c0, c1, c2, c3, c4, c5, c6, c7, note, windows } from './constants.js'
+import { Note } from './Note.js'
+import { updateGrooveGauge } from './OtherManager.js'
 
-export class SlashNote extends Archetype {
-    import = this.defineImport({
-        beat: { name: EngineArchetypeDataName.Beat, type: Number },
-        lane: { name: 'lane', type: Number },
-    })
-
-    targetTime = this.entityMemory(Number)
-    spawnTime = this.entityMemory(Number)
-    visualTime = this.entityMemory(Range)
-    z = this.entityMemory(Number)
-    inputTime = this.entityMemory(Range)
-    touchOrder = 1
-    hasInput = true
-    hitbox = this.entityMemory(Rect)
+export class SlashNote extends Note {
     activatedTouchId = this.entityMemory(TouchId)
+    flicked = this.entityMemory(Boolean)
+    waitingRelease = this.entityMemory(Boolean)
+    pressTime = this.entityMemory(Number)
+    sprite = skin.sprites.slashNote
 
-    initialize() {
-        this.z = 1000 - this.targetTime
-        this.result.accuracy = windows.good.max
-    }
-
-    preprocess() {
-        this.inputTime.copyFrom(windows.good.add(this.targetTime).add(input.offset))
-        this.targetTime = bpmChanges.at(this.import.beat).time
-
-        this.visualTime.copyFrom(
-            Range.l.mul(1 / options.noteSpeed).add(timeScaleChanges.at(this.targetTime).scaledTime),
-        )
-        this.spawnTime = this.visualTime.min
-    }
-
-    spawnOrder() {
-        return 1000 + this.spawnTime
-    }
-    shouldSpawn() {
-        return time.now >= this.spawnTime
-    }
-    globalPreprocess() {
-        buckets.note.set(bucketWindows)
+    judgeHold(d: number): Judgment {
+        return d <= holdWindows.perfect.max
+            ? Judgment.Perfect
+            : d <= holdWindows.great.max
+              ? Judgment.Great
+              : d <= holdWindows.good.max
+                ? Judgment.Good
+                : Judgment.Miss
     }
 
     complete(touch: Touch) {
-        this.result.judgment = input.judge(touch.startTime, this.targetTime, windows)
-        this.result.accuracy = touch.startTime - this.targetTime
+        const holdLength = touch.time - this.pressTime
+        const timeJudge = input.judge(this.pressTime, this.targetTime, windows)
+        const holdJudge = this.judgeHold(holdLength)
 
-        this.result.bucket.index = buckets.note.index
-        this.result.bucket.value = this.result.accuracy * 1000
+        this.result.judgment = Math.max(timeJudge, holdJudge)
+
+        this.result.bucket.index = buckets.slashNote.index
+        this.result.bucket.value = timeJudge
+
+        this.result.accuracy = timeJudge
 
         particle.effects.note.spawn(this.hitbox, 0.3, false)
+
+        updateGrooveGauge(this.result.judgment)
 
         this.despawn = true
     }
 
-    incomplete() {
+    fineComplete() {
+        this.result.judgment = input.judge(this.targetTime - 199, this.targetTime, windows)
+        this.result.accuracy = this.targetTime - 199 - this.targetTime
+
+        this.result.bucket.index = buckets.slashNote.index
+        this.result.bucket.value = this.result.accuracy * 1000
+
+        particle.effects.note.spawn(this.hitbox, 0.3, false)
+
+        updateGrooveGauge(this.result.judgment)
+
+        this.despawn = true
+    }
+
+    inComplete() {
         this.despawn = true
     }
 
@@ -71,9 +68,47 @@ export class SlashNote extends Archetype {
 
             const d = touch.position.sub(touch.startPosition).length
             if (d >= 0.04) {
+                this.flicked = true
+                this.waitingRelease = true
+                this.activatedTouchId = touch.id
+            } else {
+                this.fineComplete()
+            }
+            return
+        }
+    }
+
+    checkRelease() {
+        if (!this.waitingRelease) return
+
+        // 対象指を探す
+        for (const touch of touches) {
+            if (touch.id !== this.activatedTouchId) continue
+
+            if (touch.ended) {
                 this.complete(touch)
-            } else if (touch.ended) {
-                this.incomplete()
+                this.waitingRelease = false
+                return
+            }
+            return
+        }
+
+        if (time.now > this.inputTime.max) {
+            this.inComplete()
+            this.waitingRelease = false
+        }
+    }
+
+    judgement() {
+        for (const touch of touches) {
+            if (!this.hitbox.contains(touch.position)) continue
+            if (isUsed(touch)) continue
+            markAsUsed(touch)
+
+            if (touch.ended) {
+                this.complete(touch)
+            } else {
+                this.inComplete()
             }
             return
         }
@@ -88,6 +123,7 @@ export class SlashNote extends Archetype {
             markAsUsed(touch)
 
             this.activatedTouchId = touch.id
+            this.pressTime = touch.startTime
             return
         }
     }
@@ -95,87 +131,25 @@ export class SlashNote extends Archetype {
     touch() {
         if (time.now < this.inputTime.min) return
 
-        if (this.activatedTouchId) {
-            this.touchComplete()
-        } else {
-            this.touchActivate()
+        if (this.waitingRelease) {
+            this.checkRelease()
+            return
         }
+
+        if (!this.activatedTouchId) {
+            this.touchActivate()
+            return
+        }
+
+        this.touchComplete()
     }
 
-    updateParallel() {
-        if (this.despawn) return
-
-        const t = time.now
-        const travelStart = this.visualTime.min
-        const travelDuration = this.visualTime.max - this.visualTime.min
-        const travelEnd = this.visualTime.max
-        const holdDuration = 0.2
-        const r = note.radius
-        const lane = this.import.lane
-        const cx =
-            lane === 0
-                ? c0.x
-                : lane === 1
-                  ? c1.x
-                  : lane === 2
-                    ? c2.x
-                    : lane === 3
-                      ? c3.x
-                      : lane === 4
-                        ? c4.x
-                        : lane === 5
-                          ? c5.x
-                          : lane === 6
-                            ? c6.x
-                            : c7.x
-
-        const cy =
-            lane === 0
-                ? c0.y
-                : lane === 1
-                  ? c1.y
-                  : lane === 2
-                    ? c2.y
-                    : lane === 3
-                      ? c3.y
-                      : lane === 4
-                        ? c4.y
-                        : lane === 5
-                          ? c5.y
-                          : lane === 6
-                            ? c6.y
-                            : c7.y
-
-        if (t < travelStart + travelDuration) {
-            const ny = (t - travelStart) / travelDuration
-
-            const len = Math.hypot(cx, cy)
-            const dirX = cx / len
-            const dirY = cy / len
-            const spawnDist = 1.2
-            const startX = dirX * spawnDist
-            const startY = dirY * spawnDist
-
-            const x = startX * (1 - ny) + cx * ny
-            const y = startY * (1 - ny) + cy * ny
-
-            const layout = Rect.one.mul(r).translate(x, y)
-            const hitLayout = Rect.one.mul(r * 3).translate(x, y)
-
-            this.hitbox.copyFrom(hitLayout)
-            skin.sprites.slashNote.draw(layout, this.z, 1)
-            return
+    updateSequential() {
+        if (time.now > this.targetTime + windows.good.max) {
+            if (!this.waitingRelease && !this.flicked) {
+                updateGrooveGauge(Judgment.Miss)
+                this.despawn = true
+            }
         }
-
-        if (t < travelEnd + holdDuration) {
-            const layout = Rect.one.mul(r).translate(cx, cy)
-            const hitLayout = Rect.one.mul(r * 3).translate(cx, cy)
-
-            this.hitbox.copyFrom(hitLayout)
-            skin.sprites.slashNote.draw(layout, this.z, 1)
-            return
-        }
-
-        this.despawn = true
     }
 }

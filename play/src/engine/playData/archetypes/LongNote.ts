@@ -1,48 +1,37 @@
 import { EngineArchetypeDataName } from '@sonolus/core'
+import { note, windows } from '../../../../../shared/src/engine/constants.js'
+import { getLaneX, getLaneY } from '../../../../../shared/src/engine/utils.js'
 import { options } from '../../configuration/options.js'
 import { buckets } from '../buckets.js'
 import { particle } from '../particle.js'
 import { skin } from '../skin.js'
-import { bucketWindows, c0, c1, c2, c3, c4, c5, c6, c7, note, windows } from './constants.js'
+import { Note } from './Note.js'
+import { updateGrooveGauge } from './OtherManager.js'
 
-export class LongNote extends Archetype {
+export class LongNote extends Note {
     import = this.defineImport({
         beat: { name: EngineArchetypeDataName.Beat, type: Number },
         lane: { name: 'lane', type: Number },
         length: { name: 'length', type: Number },
     })
 
-    targetTime = this.entityMemory(Number)
-    spawnTime = this.entityMemory(Number)
-    visualTime = this.entityMemory(Range)
-    z = this.entityMemory(Number)
-    inputTime = this.entityMemory(Range)
-    touchOrder = 1
-    hasInput = true
-    hitbox = this.entityMemory(Rect)
-
     tailTime = this.entityMemory(Number)
     tailVisualTime = this.entityMemory(Range)
     spawnTailTime = this.entityMemory(Number)
     hitTime = this.entityMemory(Number)
     played = this.entityMemory(Boolean)
+    spawnOffset = this.entityMemory(Number)
+    holdingTouches = this.entityMemory(Number)
 
     initialize() {
-        this.z = 1000 - this.targetTime
-        this.result.accuracy = windows.good.max
+        super.initialize()
         this.played = false
     }
 
     preprocess() {
-        this.inputTime.copyFrom(windows.good.add(this.targetTime).add(input.offset))
-        this.targetTime = bpmChanges.at(this.import.beat).time
+        super.preprocess()
 
         const lengthFactor = 1 / options.noteSpeed
-
-        this.visualTime.copyFrom(
-            Range.l.mul(lengthFactor).add(timeScaleChanges.at(this.targetTime).scaledTime),
-        )
-        this.spawnTime = this.visualTime.min
 
         const tailBeat = this.import.beat + this.import.length
         this.tailTime = bpmChanges.at(tailBeat).time
@@ -51,22 +40,20 @@ export class LongNote extends Archetype {
             Range.l.mul(lengthFactor).add(timeScaleChanges.at(this.tailTime).scaledTime),
         )
 
-        this.spawnTailTime = this.tailVisualTime.min
-    }
+        this.spawnTailTime = this.tailVisualTime.min - 2000
 
-    spawnOrder() {
-        return 1000 + this.spawnTime
-    }
-    shouldSpawn() {
-        return time.now >= this.spawnTime
-    }
-    globalPreprocess() {
-        buckets.note.set(bucketWindows)
+        const LEAD_TIME = 0
+        this.spawnOffset = 1.2 + LEAD_TIME / options.noteSpeed
     }
 
     touch() {
+        this.holdingTouches = 0
         for (const touch of touches) {
-            if (this.played) return
+            if (this.played) {
+                if (this.hitbox.contains(touch.position)) {
+                    this.holdingTouches += 1
+                }
+            }
             if (this.despawn) return
             if (time.now < this.inputTime.min) return
             if (!touch.started) continue
@@ -76,16 +63,23 @@ export class LongNote extends Archetype {
             particle.effects.note.spawn(this.hitbox, 0.3, false)
             return
         }
+        if (this.played && this.holdingTouches <= 0) {
+            this.despawn = true
+        }
     }
 
     completeHold(hitTime: number) {
         this.result.judgment = input.judge(hitTime, this.targetTime, windows)
         this.result.accuracy = hitTime - this.targetTime
 
-        this.result.bucket.index = buckets.note.index
+        this.result.bucket.index = buckets.longNote.index
         this.result.bucket.value = this.result.accuracy * 1000
 
-        if (hitTime >= 0) particle.effects.note.spawn(this.hitbox, 0.3, false)
+        if (hitTime >= 0) {
+            particle.effects.note.spawn(this.hitbox, 0.3, false)
+
+            updateGrooveGauge(this.result.judgment)
+        }
 
         this.despawn = true
     }
@@ -99,55 +93,23 @@ export class LongNote extends Archetype {
             return
         }
 
-        if (time.now > this.tailVisualTime.max) {
-            this.completeHold(-1000)
-        }
+        super.updateSequential()
     }
+
     updateParallel() {
         if (this.despawn) return
 
         const t = time.now
-        const holdDuration = 0.2
+        const holdDuration = this.visualTime.max - this.visualTime.min
         const r = note.radius
         const lane = this.import.lane
-        const cx =
-            lane === 0
-                ? c0.x
-                : lane === 1
-                  ? c1.x
-                  : lane === 2
-                    ? c2.x
-                    : lane === 3
-                      ? c3.x
-                      : lane === 4
-                        ? c4.x
-                        : lane === 5
-                          ? c5.x
-                          : lane === 6
-                            ? c6.x
-                            : c7.x
-
-        const cy =
-            lane === 0
-                ? c0.y
-                : lane === 1
-                  ? c1.y
-                  : lane === 2
-                    ? c2.y
-                    : lane === 3
-                      ? c3.y
-                      : lane === 4
-                        ? c4.y
-                        : lane === 5
-                          ? c5.y
-                          : lane === 6
-                            ? c6.y
-                            : c7.y
+        const cx = getLaneX(lane)
+        const cy = getLaneY(lane)
 
         const len = Math.hypot(cx, cy)
         const vx = cx / len
         const vy = cy / len
-        const sd = 1.2
+        const sd = this.spawnOffset
         const sx = vx * sd
         const sy = vy * sd
 
@@ -167,7 +129,7 @@ export class LongNote extends Archetype {
             const tailX = sx * pTail + cx * (1 - pTail)
             const tailY = sy * pTail + cy * (1 - pTail)
 
-            skin.sprites.judgeLine.draw(
+            skin.sprites.longNoteTail.draw(
                 new Quad({
                     x1: tailX + perpX,
                     y1: tailY + perpY,
@@ -198,7 +160,7 @@ export class LongNote extends Archetype {
         const headY = sy * (1 - pH) + cy * pH
 
         if (t < hEnd) {
-            skin.sprites.judgeLine.draw(
+            skin.sprites.longNoteTail.draw(
                 new Quad({
                     x1: tx + perpX,
                     y1: ty + perpY,
@@ -215,16 +177,14 @@ export class LongNote extends Archetype {
 
             skin.sprites.longNote.draw(Rect.one.mul(r).translate(headX, headY), this.z, 1)
             skin.sprites.longNote.draw(Rect.one.mul(r).translate(tx, ty), this.z, 1)
-            this.hitbox.copyFrom(Rect.one.mul(r * 3).translate(headX, headY))
+            this.hitbox.copyFrom(Rect.one.mul(r * 5).translate(headX, headY))
             return
         }
 
         if (t < hEnd + holdDuration) {
             skin.sprites.longNote.draw(Rect.one.mul(r).translate(cx, cy), this.z, 1)
-            this.hitbox.copyFrom(Rect.one.mul(r * 2.5).translate(cx, cy))
+            this.hitbox.copyFrom(Rect.one.mul(r * 5).translate(cx, cy))
             return
         }
-
-        this.despawn = true
     }
 }

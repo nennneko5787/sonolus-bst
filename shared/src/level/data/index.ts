@@ -158,5 +158,96 @@ export const data: LevelData = {
                 },
             ],
         },
+        {
+            archetype: 'RippleNote',
+            data: [
+                {
+                    name: EngineArchetypeDataName.Beat,
+                    value: 14,
+                },
+                {
+                    name: 'lane',
+                    value: 0,
+                },
+            ],
+        },
+        {
+            archetype: 'RippleNote',
+            data: [
+                {
+                    name: EngineArchetypeDataName.Beat,
+                    value: 15,
+                },
+                {
+                    name: 'lane',
+                    value: 1,
+                },
+            ],
+        },
+        {
+            archetype: 'RippleNote',
+            data: [
+                {
+                    name: EngineArchetypeDataName.Beat,
+                    value: 16,
+                },
+                {
+                    name: 'lane',
+                    value: 2,
+                },
+            ],
+        },
+        {
+            archetype: 'RippleNote',
+            data: [
+                {
+                    name: EngineArchetypeDataName.Beat,
+                    value: 17,
+                },
+                {
+                    name: 'lane',
+                    value: 3,
+                },
+            ],
+        },
+        {
+            archetype: 'RippleNote',
+            data: [
+                {
+                    name: EngineArchetypeDataName.Beat,
+                    value: 18,
+                },
+                {
+                    name: 'lane',
+                    value: 4,
+                },
+            ],
+        },
+        {
+            archetype: 'RippleNote',
+            data: [
+                {
+                    name: EngineArchetypeDataName.Beat,
+                    value: 19,
+                },
+                {
+                    name: 'lane',
+                    value: 5,
+                },
+            ],
+        },
+        {
+            archetype: 'RippleNote',
+            data: [
+                {
+                    name: EngineArchetypeDataName.Beat,
+                    value: 20,
+                },
+                {
+                    name: 'lane',
+                    value: 6,
+                },
+            ],
+        },
     ],
 }
