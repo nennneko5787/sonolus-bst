@@ -1,4 +1,5 @@
-import { holdWindows, windows } from '../../../../../../shared/src/engine/constants.js'
+import { holdWindows, sizes, windows } from '../../../../../../shared/src/engine/constants.js'
+import { getLaneX, getLaneY } from '../../../../../../shared/src/engine/utils.js'
 import { buckets } from '../../buckets.js'
 import { particle } from '../../particle.js'
 import { skin } from '../../skin.js'
@@ -11,7 +12,7 @@ export class SlashNote extends Note {
     flicked = this.entityMemory(Boolean)
     waitingRelease = this.entityMemory(Boolean)
     pressTime = this.entityMemory(Number)
-    sprite = skin.sprites.slashNote
+    sprite = skin.sprites.slashNoteFallback
 
     judgeHold(d: number): Judgment {
         return d <= holdWindows.perfect.max
@@ -150,6 +151,56 @@ export class SlashNote extends Note {
                 updateGrooveGauge(Judgment.Miss)
                 this.despawn = true
             }
+        }
+    }
+
+    updateParallel() {
+        if (this.despawn) return
+
+        const sprite = skin.sprites.slashNoteFallback
+
+        const t = time.now
+        const travelStart = this.visualTime.min
+        const travelDuration = this.visualTime.max - this.visualTime.min
+        const travelEnd = this.visualTime.max
+        const holdDuration = this.visualTime.max - this.visualTime.min
+        const r = sizes.note
+        const lane = this.import.lane
+        const cx = getLaneX(lane)
+        const cy = getLaneY(lane)
+
+        if (t < travelStart + travelDuration) {
+            const ny = (t - travelStart) / travelDuration
+
+            const len = Math.hypot(cx, cy)
+            const dirX = cx / len
+            const dirY = cy / len
+            const spawnDist = 1.2
+            const startX = dirX * spawnDist
+            const startY = dirY * spawnDist
+
+            const x = startX * (1 - ny) + cx * ny
+            const y = startY * (1 - ny) + cy * ny
+
+            const layout = Rect.one.mul(r).translate(x, y)
+            const hitLayout = Rect.one.mul(r * 5).translate(x, y)
+            const effectHitbox = Rect.one.mul(sizes.effectSize).translate(x, y)
+
+            this.effectHitbox.copyFrom(effectHitbox)
+            this.hitbox.copyFrom(hitLayout)
+            sprite.draw(layout, this.z, 1)
+            return
+        }
+
+        if (t < travelEnd + holdDuration) {
+            const layout = Rect.one.mul(r).translate(cx, cy)
+            const hitLayout = Rect.one.mul(r * 5).translate(cx, cy)
+            const effectHitbox = Rect.one.mul(sizes.effectSize).translate(cx, cy)
+
+            this.effectHitbox.copyFrom(effectHitbox)
+            this.hitbox.copyFrom(hitLayout)
+            sprite.draw(layout, this.z, 1)
+            return
         }
     }
 }

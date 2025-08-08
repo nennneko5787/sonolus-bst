@@ -5,7 +5,7 @@ export const buckets = defineBuckets({
     note: {
         sprites: [
             {
-                id: skin.sprites.note.id,
+                id: skin.sprites.noteFallback.id,
                 x: 0,
                 y: 0,
                 w: 2,
@@ -18,7 +18,7 @@ export const buckets = defineBuckets({
     longNote: {
         sprites: [
             {
-                id: skin.sprites.longNote.id,
+                id: skin.sprites.longNoteFallback.id,
                 x: -1,
                 y: 0,
                 w: 2,
@@ -26,7 +26,7 @@ export const buckets = defineBuckets({
                 rotation: 0,
             },
             {
-                id: skin.sprites.longNoteTail.id,
+                id: skin.sprites.longNoteTailFallback.id,
                 x: 1,
                 y: 0,
                 w: 2,
@@ -39,7 +39,7 @@ export const buckets = defineBuckets({
     slashNote: {
         sprites: [
             {
-                id: skin.sprites.slashNote.id,
+                id: skin.sprites.slashNoteFallback.id,
                 x: 0,
                 y: 0,
                 w: 2,
@@ -52,7 +52,7 @@ export const buckets = defineBuckets({
     rippleNote: {
         sprites: [
             {
-                id: skin.sprites.rippleNote.id,
+                id: skin.sprites.rippleNoteFallback.id,
                 x: 0,
                 y: 0,
                 w: 2,

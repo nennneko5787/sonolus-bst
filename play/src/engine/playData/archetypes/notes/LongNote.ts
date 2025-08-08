@@ -129,7 +129,7 @@ export class LongNote extends Note {
             const tailX = sx * pTail + cx * (1 - pTail)
             const tailY = sy * pTail + cy * (1 - pTail)
 
-            skin.sprites.longNoteTail.draw(
+            skin.sprites.longNoteTailFallback.draw(
                 new Quad({
                     x1: tailX + perpX,
                     y1: tailY + perpY,
@@ -144,8 +144,8 @@ export class LongNote extends Note {
                 1,
             )
 
-            skin.sprites.longNote.draw(Rect.one.mul(r).translate(cx, cy), this.z, 1)
-            skin.sprites.longNote.draw(Rect.one.mul(r).translate(tailX, tailY), this.z, 1)
+            skin.sprites.longNoteFallback.draw(Rect.one.mul(r).translate(cx, cy), this.z, 1)
+            skin.sprites.longNoteFallback.draw(Rect.one.mul(r).translate(tailX, tailY), this.z, 1)
             this.hitbox.copyFrom(Rect.one.mul(r * 3).translate(cx, cy))
             return
         }
@@ -160,7 +160,7 @@ export class LongNote extends Note {
         const headY = sy * (1 - pH) + cy * pH
 
         if (t < hEnd) {
-            skin.sprites.longNoteTail.draw(
+            skin.sprites.longNoteTailFallback.draw(
                 new Quad({
                     x1: tx + perpX,
                     y1: ty + perpY,
@@ -175,15 +175,15 @@ export class LongNote extends Note {
                 1,
             )
 
-            skin.sprites.longNote.draw(Rect.one.mul(r).translate(headX, headY), this.z, 1)
-            skin.sprites.longNote.draw(Rect.one.mul(r).translate(tx, ty), this.z, 1)
+            skin.sprites.longNoteFallback.draw(Rect.one.mul(r).translate(headX, headY), this.z, 1)
+            skin.sprites.longNoteFallback.draw(Rect.one.mul(r).translate(tx, ty), this.z, 1)
             this.hitbox.copyFrom(Rect.one.mul(r * 5).translate(headX, headY))
             this.effectHitbox.copyFrom(Rect.one.mul(sizes.effectSize).translate(headX, headY))
             return
         }
 
         if (t < hEnd + holdDuration) {
-            skin.sprites.longNote.draw(Rect.one.mul(r).translate(cx, cy), this.z, 1)
+            skin.sprites.longNoteFallback.draw(Rect.one.mul(r).translate(cx, cy), this.z, 1)
             this.hitbox.copyFrom(Rect.one.mul(r * 5).translate(cx, cy))
             this.effectHitbox.copyFrom(Rect.one.mul(sizes.effectSize).translate(cx, cy))
             return

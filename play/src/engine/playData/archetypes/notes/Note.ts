@@ -22,7 +22,6 @@ export class Note extends Archetype {
     touchOrder = 1
     hasInput = true
     hitbox = this.entityMemory(Rect)
-    sprite = skin.sprites.note
     effectHitbox = this.entityMemory(Rect)
 
     initialize() {
@@ -87,6 +86,9 @@ export class Note extends Archetype {
     updateParallel() {
         if (this.despawn) return
 
+        const circle = skin.sprites.notePink
+        const cycle = skin.sprites.baseCycle
+
         const t = time.now
         const travelStart = this.visualTime.min
         const travelDuration = this.visualTime.max - this.visualTime.min
@@ -96,10 +98,9 @@ export class Note extends Archetype {
         const lane = this.import.lane
         const cx = getLaneX(lane)
         const cy = getLaneY(lane)
+        const ny = (t - travelStart) / travelDuration
 
         if (t < travelStart + travelDuration) {
-            const ny = (t - travelStart) / travelDuration
-
             const len = Math.hypot(cx, cy)
             const dirX = cx / len
             const dirY = cy / len
@@ -116,7 +117,10 @@ export class Note extends Archetype {
 
             this.effectHitbox.copyFrom(effectHitbox)
             this.hitbox.copyFrom(hitLayout)
-            this.sprite.draw(layout, this.z, 1)
+            circle.draw(layout, this.z, 1)
+            if (cycle != null) {
+                cycle.draw(layout.rotate(2 + ny), this.z - 0.1, 1)
+            }
             return
         }
 
@@ -127,7 +131,10 @@ export class Note extends Archetype {
 
             this.effectHitbox.copyFrom(effectHitbox)
             this.hitbox.copyFrom(hitLayout)
-            this.sprite.draw(layout, this.z, 1)
+            circle.draw(layout, this.z, 1)
+            if (cycle != null) {
+                cycle.draw(layout.rotate(2 + ny), this.z - 0.1, 1)
+            }
             return
         }
     }

@@ -178,7 +178,7 @@ export class Stage extends Archetype {
         }
 
         // ripples
-        skin.sprites.rippleNoteGuide.draw(
+        skin.sprites.rippleNoteGuideFallback.draw(
             Rect.one
                 .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
@@ -187,7 +187,7 @@ export class Stage extends Archetype {
             0.5,
         )
 
-        skin.sprites.rippleNoteGuide.draw(
+        skin.sprites.rippleNoteGuideFallback.draw(
             Rect.one
                 .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
@@ -196,7 +196,7 @@ export class Stage extends Archetype {
             0.5,
         )
 
-        skin.sprites.rippleNoteGuide.draw(
+        skin.sprites.rippleNoteGuideFallback.draw(
             Rect.one
                 .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
@@ -205,7 +205,7 @@ export class Stage extends Archetype {
             0.5,
         )
 
-        skin.sprites.rippleNoteGuide.draw(
+        skin.sprites.rippleNoteGuideFallback.draw(
             Rect.one
                 .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
@@ -214,7 +214,7 @@ export class Stage extends Archetype {
             0.5,
         )
 
-        skin.sprites.rippleNoteGuide.draw(
+        skin.sprites.rippleNoteGuideFallback.draw(
             Rect.one
                 .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
@@ -223,7 +223,7 @@ export class Stage extends Archetype {
             0.5,
         )
 
-        skin.sprites.rippleNoteGuide.draw(
+        skin.sprites.rippleNoteGuideFallback.draw(
             Rect.one
                 .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)
@@ -232,7 +232,7 @@ export class Stage extends Archetype {
             0.5,
         )
 
-        skin.sprites.rippleNoteGuide.draw(
+        skin.sprites.rippleNoteGuideFallback.draw(
             Rect.one
                 .mul(sizes.rippleNote * 2.5)
                 .scale(1, -1)

@@ -69,7 +69,7 @@ export class RippleNote extends Note {
 
         this.hitbox.copyFrom(hitLayout)
         this.effectHitbox.copyFrom(effectHitbox)
-        skin.sprites.rippleNote.draw(layout, this.z, 0.4)
-        skin.sprites.rippleNote.draw(normalLayout, this.z, size)
+        skin.sprites.rippleNoteFallback.draw(layout, this.z, 0.4)
+        skin.sprites.rippleNoteFallback.draw(normalLayout, this.z, size)
     }
 }
